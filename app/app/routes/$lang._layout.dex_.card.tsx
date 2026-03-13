@@ -33,6 +33,20 @@ interface NetworkInfo {
 
 type NetworksResponse = NetworkInfo[];
 
+const sanitizeUrl = (url: string | null | undefined): string | null => {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url, window.location.origin);
+    const protocol = parsed.protocol.toLowerCase();
+    if (protocol === "http:" || protocol === "https:") {
+      return parsed.toString();
+    }
+  } catch {
+    // Ignore parsing errors and treat as invalid
+  }
+  return null;
+};
+
 export default function DexCardRoute() {
   const { t } = useTranslation();
   const { isAuthenticated, token, isLoading } = useAuth();
@@ -837,12 +851,14 @@ export default function DexCardRoute() {
                     brokerId: dexData.brokerId,
                     brokerName: dexData.brokerName,
                     dexUrl:
-                      websiteUrl ||
-                      (dexData.customDomain
-                        ? `https://${dexData.customDomain}`
-                        : dexData.repoUrl
-                          ? `https://dex.orderly.network/${dexData.repoUrl.split("/").pop()}/`
-                          : null),
+                      sanitizeUrl(
+                        websiteUrl ||
+                          (dexData.customDomain
+                            ? `https://${dexData.customDomain}`
+                            : dexData.repoUrl
+                              ? `https://dex.orderly.network/${dexData.repoUrl.split("/").pop()}/`
+                              : null),
+                      ),
                     totalVolume: 1250000,
                     totalPnl: 85000,
                     description,
