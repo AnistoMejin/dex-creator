@@ -43,12 +43,8 @@ type KeyEntry = {
 
 /** Unescape a double-quoted string value (handles \", \\, \n, etc.) */
 function unescapeValue(s: string): string {
-  return s
-    .replace(/\\"/g, '"')
-    .replace(/\\\\/g, "\\")
-    .replace(/\\n/g, "\n")
-    .replace(/\\r/g, "\r")
-    .replace(/\\t/g, "\t");
+  // Let the JSON parser handle all standard escape sequences safely.
+  return JSON.parse(`"${s}"`);
 }
 
 /** Parse module file content and return key-value entries with line ranges (1-based). */
