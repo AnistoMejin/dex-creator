@@ -30,6 +30,20 @@ interface DexCardProps {
   timePeriod?: TimePeriod;
 }
 
+const sanitizeUrl = (url: string | null | undefined): string | null => {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url, window.location.origin);
+    const protocol = parsed.protocol.toLowerCase();
+    if (protocol === "http:" || protocol === "https:") {
+      return parsed.toString();
+    }
+  } catch {
+    // Fall through to return null
+  }
+  return null;
+};
+
 const formatVolume = (num: number) => {
   if (num >= 1e9) return `${(num / 1e9).toFixed(2)}B`;
   if (num >= 1e6) return `${(num / 1e6).toFixed(2)}M`;
@@ -174,7 +188,7 @@ export default function DexCard({ broker, rank, timePeriod }: DexCardProps) {
           <div className="flex gap-2">
             {/* DEX Link CTA Button */}
             <a
-              href={broker.dexUrl || "#"}
+              href={sanitizeUrl(broker.dexUrl) || "#"}
               target="_blank"
               rel="noopener noreferrer"
               onClick={e => e.stopPropagation()}
@@ -185,9 +199,9 @@ export default function DexCard({ broker, rank, timePeriod }: DexCardProps) {
             </a>
 
             {/* Website Link CTA Button */}
-            {broker.websiteUrl && (
+            {sanitizeUrl(broker.websiteUrl) && (
               <a
-                href={broker.websiteUrl}
+                href={sanitizeUrl(broker.websiteUrl) as string}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={e => e.stopPropagation()}
